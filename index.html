@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Gallery</title>
+    <title>Videos Gallery</title>
     <style>
         * {
             margin: 0;
@@ -12,131 +12,170 @@
         }
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: #f0f2f5;
+            padding: 20px;
         }
-        .container {
+        .header {
             background: white;
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            text-align: center;
-            max-width: 600px;
-            width: 90%;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-        }
-        .subtitle {
-            color: #666;
-            margin-bottom: 40px;
-        }
-        .options {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
             display: flex;
-            gap: 30px;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
         }
-        .option-card {
-            background: #f8f9fa;
-            padding: 40px 30px;
-            border-radius: 15px;
-            text-decoration: none;
+        .header h1 {
             color: #333;
-            transition: all 0.3s ease;
-            flex: 1;
-            min-width: 150px;
-            border: 2px solid transparent;
         }
-        .option-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            border-color: #667eea;
-        }
-        .option-card .icon {
-            font-size: 4rem;
-            display: block;
-            margin-bottom: 15px;
-        }
-        .option-card h2 {
-            font-size: 1.5rem;
-        }
-        .upload-section {
-            margin-top: 40px;
-            padding-top: 40px;
-            border-top: 2px solid #eee;
-        }
-        .upload-btn {
+        .back-btn {
             background: #667eea;
             color: white;
-            padding: 12px 30px;
+            padding: 10px 25px;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: background 0.3s;
+        }
+        .back-btn:hover {
+            background: #5a67d8;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .video-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .video-card:hover {
+            transform: scale(1.02);
+        }
+        .video-card video {
+            width: 100%;
+            height: 200px;
+            background: #000;
+        }
+        .video-card .caption {
+            padding: 15px;
+            color: #333;
+            text-align: center;
+        }
+        .no-videos {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            grid-column: 1 / -1;
+            font-size: 1.2rem;
+        }
+        .no-videos .icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 20px;
+        }
+        .refresh-btn {
+            background: #667eea;
+            color: white;
             border: none;
+            padding: 10px 30px;
             border-radius: 50px;
             cursor: pointer;
             font-size: 1rem;
-            transition: background 0.3s;
+            margin: 20px 0;
         }
-        .upload-btn:hover {
+        .refresh-btn:hover {
             background: #5a67d8;
-        }
-        #fileInput {
-            display: none;
-        }
-        .status {
-            margin-top: 15px;
-            color: #666;
-            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📸 My Gallery</h1>
-        <p class="subtitle">Choose what you want to view</p>
-        
-        <div class="options">
-            <a href="images.html" class="option-card">
-                <span class="icon">🖼️</span>
-                <h2>Images</h2>
-            </a>
-            <a href="videos.html" class="option-card">
-                <span class="icon">🎬</span>
-                <h2>Videos</h2>
-            </a>
-        </div>
+    <div class="header">
+        <h1>🎬 Videos Gallery</h1>
+        <a href="index.html" class="back-btn">← Back to Home</a>
+    </div>
 
-        <div class="upload-section">
-            <h3>📤 Upload Media</h3>
-            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                Choose File to Upload
-            </button>
-            <input type="file" id="fileInput" multiple accept="image/*,video/*">
-            <div class="status" id="status">Select images or videos to upload</div>
+    <div style="text-align: center; margin: 10px 0;">
+        <button class="refresh-btn" onclick="loadVideos()">🔄 Refresh Gallery</button>
+    </div>
+
+    <div class="gallery" id="videoGallery">
+        <div class="no-videos">
+            <span class="icon">🎥</span>
+            <h3>Loading videos...</h3>
         </div>
     </div>
 
     <script>
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const files = e.target.files;
-            const status = document.getElementById('status');
+        async function loadVideos() {
+            const gallery = document.getElementById('videoGallery');
             
-            if (files.length > 0) {
-                status.innerHTML = `✅ ${files.length} file(s) selected. 
-                <br>⚠️ Note: For GitHub Pages, you'll need to commit these files to your repository.
-                <br>📝 Files will appear in the uploads/ folder.`;
+            gallery.innerHTML = `
+                <div class="no-videos">
+                    <span class="icon">🔄</span>
+                    <h3>Loading your videos...</h3>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(
+                    'https://api.github.com/repos/evilquinnn/evilquinnn.github.io/contents/uploads/videos'
+                );
                 
-                let fileNames = [];
-                for(let i = 0; i < files.length; i++) {
-                    fileNames.push(files[i].name);
+                if (!response.ok) {
+                    throw new Error('Could not load videos');
                 }
-                status.innerHTML += `<br><small>Files: ${fileNames.join(', ')}</small>`;
+                
+                const files = await response.json();
+                
+                const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+                const videoFiles = files.filter(file => {
+                    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+                    return videoExtensions.includes(ext) && file.name !== '.gitkeep';
+                });
+                
+                if (videoFiles.length === 0) {
+                    gallery.innerHTML = `
+                        <div class="no-videos">
+                            <span class="icon">🎥</span>
+                            <h3>No Videos Yet</h3>
+                            <p>Upload videos to uploads/videos/ folder</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                gallery.innerHTML = videoFiles.map(file => `
+                    <div class="video-card">
+                        <video controls>
+                            <source src="${file.download_url}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="caption">${file.name}</div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                gallery.innerHTML = `
+                    <div class="no-videos">
+                        <span class="icon">⚠️</span>
+                        <h3>Could not load videos</h3>
+                        <p>Make sure you have uploaded videos to uploads/videos/</p>
+                        <p style="font-size: 0.8rem; margin-top: 10px; color: #999;">
+                            If you just uploaded, wait 2 minutes and click Refresh
+                        </p>
+                    </div>
+                `;
+                console.error('Error loading videos:', error);
             }
-        });
+        }
+        
+        loadVideos();
     </script>
 </body>
 </html>
