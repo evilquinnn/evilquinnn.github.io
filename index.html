@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .options {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .option-card {
+            background: #f8f9fa;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+            border: 2px solid transparent;
+        }
+        .option-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+        .option-card .icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 15px;
+        }
+        .option-card h2 {
+            font-size: 1.5rem;
+        }
+        .upload-section {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 2px solid #eee;
+        }
+        .upload-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        .upload-btn:hover {
+            background: #5a67d8;
+        }
+        #fileInput {
+            display: none;
+        }
+        .status {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📸 My Gallery</h1>
+        <p class="subtitle">Choose what you want to view</p>
+        
+        <div class="options">
+            <a href="images.html" class="option-card">
+                <span class="icon">🖼️</span>
+                <h2>Images</h2>
+            </a>
+            <a href="videos.html" class="option-card">
+                <span class="icon">🎬</span>
+                <h2>Videos</h2>
+            </a>
+        </div>
+
+        <div class="upload-section">
+            <h3>📤 Upload Media</h3>
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                Choose File to Upload
+            </button>
+            <input type="file" id="fileInput" multiple accept="image/*,video/*">
+            <div class="status" id="status">Select images or videos to upload</div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const status = document.getElementById('status');
+            
+            if (files.length > 0) {
+                status.innerHTML = `✅ ${files.length} file(s) selected. 
+                <br>⚠️ Note: For GitHub Pages, you'll need to commit these files to your repository.
+                <br>📝 Files will appear in the uploads/ folder.`;
+                
+                let fileNames = [];
+                for(let i = 0; i < files.length; i++) {
+                    fileNames.push(files[i].name);
+                }
+                status.innerHTML += `<br><small>Files: ${fileNames.join(', ')}</small>`;
+            }
+        });
+    </script>
+</body>
+</html>
