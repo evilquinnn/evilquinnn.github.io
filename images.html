@@ -59,24 +59,39 @@
         }
         .image-card img {
             width: 100%;
-            height: 200px;
+            height: 250px;
             object-fit: cover;
         }
         .image-card .caption {
             padding: 15px;
             color: #333;
             font-size: 0.9rem;
+            text-align: center;
         }
-        .empty-state {
+        .no-images {
             text-align: center;
             padding: 60px 20px;
             color: #666;
             grid-column: 1 / -1;
+            font-size: 1.2rem;
         }
-        .empty-state .icon {
+        .no-images .icon {
             font-size: 4rem;
             display: block;
             margin-bottom: 20px;
+        }
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 20px 0;
+        }
+        .refresh-btn:hover {
+            background: #5a67d8;
         }
     </style>
 </head>
@@ -86,21 +101,95 @@
         <a href="index.html" class="back-btn">← Back to Home</a>
     </div>
 
+    <div style="text-align: center; margin: 10px 0;">
+        <button class="refresh-btn" onclick="loadImages()">🔄 Refresh Gallery</button>
+    </div>
+
     <div class="gallery" id="imageGallery">
-        <div class="empty-state">
+        <div class="no-images">
             <span class="icon">📸</span>
-            <h3>No Images Yet</h3>
-            <p>Upload images from the home page to see them here</p>
-            <p style="font-size: 0.8rem; margin-top: 10px;">
-                💡 To add images: Place them in the <strong>uploads/images/</strong> folder
-            </p>
+            <h3>Loading images...</h3>
         </div>
     </div>
 
     <script>
-        function loadImages() {
-            console.log('Loading images from uploads/images/');
+        // This is a list of image files - you can add more manually if needed
+        // OR use the auto-detection below
+        
+        // OPTION 1: Manual list (add your image names here)
+        const imageFiles = [
+            // Just add your image names here like this:
+            // "photo.jpg",
+            // "my-image.png",
+            // "screenshot.png"
+        ];
+        
+        // OPTION 2: Auto-detect (uses GitHub API)
+        async function loadImages() {
+            const gallery = document.getElementById('imageGallery');
+            
+            // Show loading message
+            gallery.innerHTML = `
+                <div class="no-images">
+                    <span class="icon">🔄</span>
+                    <h3>Loading your images...</h3>
+                </div>
+            `;
+            
+            try {
+                // Get list of images from GitHub
+                const response = await fetch(
+                    'https://api.github.com/repos/evilquinnn/evilquinnn.github.io/contents/uploads/images'
+                );
+                
+                if (!response.ok) {
+                    throw new Error('Could not load images');
+                }
+                
+                const files = await response.json();
+                
+                // Filter only image files
+                const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
+                const imageFiles = files.filter(file => {
+                    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+                    return imageExtensions.includes(ext) && file.name !== '.gitkeep';
+                });
+                
+                if (imageFiles.length === 0) {
+                    gallery.innerHTML = `
+                        <div class="no-images">
+                            <span class="icon">📸</span>
+                            <h3>No Images Yet</h3>
+                            <p>Upload images to uploads/images/ folder</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Display all images
+                gallery.innerHTML = imageFiles.map(file => `
+                    <div class="image-card">
+                        <img src="${file.download_url}" alt="${file.name}">
+                        <div class="caption">${file.name}</div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                gallery.innerHTML = `
+                    <div class="no-images">
+                        <span class="icon">⚠️</span>
+                        <h3>Could not load images</h3>
+                        <p>Make sure you have uploaded images to uploads/images/</p>
+                        <p style="font-size: 0.8rem; margin-top: 10px; color: #999;">
+                            If you just uploaded, wait 2 minutes and click Refresh
+                        </p>
+                    </div>
+                `;
+                console.error('Error loading images:', error);
+            }
         }
+        
+        // Load images when page opens
         loadImages();
     </script>
 </body>
